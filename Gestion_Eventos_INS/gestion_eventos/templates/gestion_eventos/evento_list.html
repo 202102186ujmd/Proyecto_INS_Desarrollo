@@ -1,0 +1,331 @@
+{% extends 'administracion/base.html' %} 
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<div class="event-container">
+    <!-- Título de la sección -->
+    <h1 class="event-title">Administración de Eventos</h1>
+
+    <!-- Contenedor de búsqueda y botón de creación -->
+    <div class="event-search-container">
+        <input type="text" id="searchInput" class="event-input" placeholder="Buscar evento por título o descripción">
+        <button class="event-btn" onclick="openModal('create')">Crear Evento</button>
+    </div>
+
+    <!-- Tabla de eventos -->
+    <div class="event-table-wrapper">
+        <table class="event-table">
+            <thead>
+                <tr>
+                    <th>Título</th>
+                    <th>Descripción</th>
+                    <th>Fecha</th>
+                    <th>Ubicación</th>
+                    <th>Estado</th>
+                    <th>Privacidad</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for evento in eventos %}
+                <tr>
+                    <td>{{ evento.titulo }}</td>
+                    <td>{{ evento.descripcion }}</td>
+                    <td>{{ evento.fecha }}</td>
+                    <td>{{ evento.ubicacion }}</td>
+                    <td>{{ evento.estado }}</td>
+                    <td>{{ evento.privacidad }}</td>
+                    <td>
+                        <button class="event-icon-btn event-edit-btn" onclick="openModal('edit', {{ evento.id_evento }})">
+                            ✏️
+                        </button>
+                        <button class="event-icon-btn event-delete-btn" onclick="confirmDelete({{ evento.id_evento }})">
+                            ❌
+                        </button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Ventana modal para crear un evento -->
+<div class="event-modal-overlay" id="modalOverlay" style="display: none;"></div>
+<form id="eventForm" method="post" class="event-modal-form" style="display: none;">
+    {% csrf_token %}
+    <h2 id="modalTitle" class="event-modal-title">Crear Evento</h2>
+
+    <div class="event-form-group">
+        <label for="titulo">Título</label>
+        <input type="text" name="titulo" id="titulo" required class="event-input-field" />
+    </div>
+    <div class="event-form-group">
+        <label for="descripcion">Descripción</label>
+        <textarea name="descripcion" id="descripcion" required class="event-input-field"></textarea>
+    </div>
+    <div class="event-form-group">
+        <label for="fecha">Fecha</label>
+        <input type="datetime-local" name="fecha" id="fecha" required class="event-input-field" />
+    </div>
+    <div class="event-form-group">
+        <label for="ubicacion">Ubicación</label>
+        <input type="text" name="ubicacion" id="ubicacion" class="event-input-field" />
+    </div>
+    <div class="event-form-group">
+        <label for="estado">Estado</label>
+        <select name="estado" id="estado" class="event-input-field">
+            <option value="Activo">Activo</option>
+            <option value="Inactivo">Inactivo</option>
+        </select>
+    </div>
+    <div class="event-form-group">
+        <label for="privacidad">Privacidad</label>
+        <select name="privacidad" id="privacidad" class="event-input-field">
+            <option value="Público">Público</option>
+            <option value="Privado">Privado</option>
+        </select>
+    </div>
+
+    <div class="event-button-container">
+        <button type="submit" class="event-save-btn">Guardar</button>
+        <button type="button" class="event-cancel-btn" onclick="closeModal()">Cancelar</button>
+    </div>
+</form>
+
+<style>
+    /* Estilos básicos */
+    :root {
+        --background: 0 0% 100%;
+        --foreground: 222.2 84% 4.9%;
+        --primary: 222.2 47.4% 11.2%;
+        --primary-foreground: 210 40% 98%;
+        --accent: 210 40% 96.1%;
+        --accent-foreground: 222.2 47.4% 11.2%;
+        --destructive: 0 84.2% 60.2%;
+        --destructive-foreground: 210 40% 98%;
+        --input: 214.3 31.8% 91.4%;
+        --ring: 222.2 84% 4.9%;
+        --radius: 0.5rem;
+    }
+
+    /* General page style */
+    .event-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .event-title {
+        font-size: 1.875 em;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        text-align: left;
+        margin-block-end: 0.83em;
+    }
+
+    .event-search-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .event-input {
+        flex: 1;
+        max-width: 300px;
+        height: 40px;
+        background-color: hsl(var(--background));
+        border-radius: var(--radius);
+        border: 1px solid hsl(var(--input));
+        padding: 0 0.75rem;
+    }
+
+    .event-btn {
+        border-radius: var(--radius);
+        font-weight: 500;
+        height: 40px;
+        padding: 0 1rem;
+        background-color: hsl(var(--primary));
+        color: hsl(var(--primary-foreground));
+        cursor: pointer;
+    }
+
+    /* Table styling */
+    .event-table-wrapper {
+        width: 100%;
+        overflow-x: auto;
+    }
+
+    .event-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .event-table th, .event-table td {
+        border-bottom: 1px solid hsl(var(--input));
+        padding: 0.75rem;
+    }
+
+    .event-table th {
+        font-weight: 600;
+        text-align: left;
+    }
+
+    /* Modal overlay */
+    .event-modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: none;
+        z-index: 1000;
+    }
+
+    /* Modal form */
+    .event-modal-form {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: hsl(var(--background));
+        padding: 20px;
+        border-radius: var(--radius);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        width: 90%;
+        max-width: 500px;
+        z-index: 1001;
+    }
+
+    .event-modal-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: hsl(var(--foreground));
+        text-align: center;
+    }
+
+    .event-form-group {
+        margin-bottom: 1rem;
+    }
+
+    .event-input-field {
+        width: 100%;
+        padding: 0.5rem;
+        border-radius: var(--radius);
+        border: 1px solid hsl(var(--input));
+        font-size: 1rem;
+    }
+
+    /* Button styling inside modal */
+    .event-button-container {
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.5rem;
+    }
+
+    .event-save-btn, .event-cancel-btn {
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: var(--radius);
+        font-weight: 500;
+        cursor: pointer;
+    }
+
+    .event-save-btn {
+        background-color: hsl(var(--primary));
+        color: hsl(var(--primary-foreground));
+    }
+
+    .event-cancel-btn {
+        background-color: hsl(var(--destructive));
+        color: hsl(var(--destructive-foreground));
+    }
+
+</style>
+
+
+<script>
+    function openModal(action, eventoId = null) {
+        document.getElementById("modalOverlay").style.display = "block";
+        document.getElementById("eventForm").style.display = "block";
+        document.getElementById("eventForm").reset();
+        document.getElementById("modalTitle").innerText = action === "edit" ? "Editar Evento" : "Crear Evento";
+
+        if (action === "edit") {
+            // Lógica para cargar los detalles del evento para editar, si es necesario
+        }
+    }
+
+    function closeModal() {
+        document.getElementById("modalOverlay").style.display = "none";
+        document.getElementById("eventForm").style.display = "none";
+        document.getElementById("eventForm").reset();
+    }
+
+    // Cerrar el modal al hacer clic en el overlay
+    document.getElementById("modalOverlay").addEventListener("click", function (event) {
+        if (event.target === this) closeModal();
+    });
+
+    // Manejar la creación de eventos
+    document.getElementById("eventForm").addEventListener("submit", function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+
+        fetch("{% url 'crear_evento' %}", {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                closeModal();
+                addEventoToTable(data.evento);
+            } else {
+                alert("Error al crear el evento. Por favor, revise los campos.");
+                console.error(data.errors);
+            }
+        })
+        .catch(error => {
+            console.error('Error en la solicitud:', error);
+            alert("Ocurrió un error al procesar la solicitud.");
+        });
+        
+    });
+
+    // Agregar el nuevo evento a la tabla sin refrescar la página
+    function addEventoToTable(evento) {
+        const tableBody = document.querySelector('.event-table tbody');
+        const newRow = document.createElement('tr');
+        newRow.innerHTML = `
+            <td>${evento.titulo}</td>
+            <td>${evento.descripcion}</td>
+            <td>${evento.fecha}</td>
+            <td>${evento.ubicacion}</td>
+            <td>${evento.estado}</td>
+            <td>${evento.privacidad}</td>
+            <td>
+                <button class="event-icon-btn event-edit-btn" onclick="openModal('edit', ${evento.id})">
+                    ✏️
+                </button>
+                <button class="event-icon-btn event-delete-btn" onclick="confirmDelete(${evento.id})">
+                    ❌
+                </button>
+            </td>
+        `;
+        tableBody.appendChild(newRow);
+    }
+</script>
+
+
+{% endblock %}

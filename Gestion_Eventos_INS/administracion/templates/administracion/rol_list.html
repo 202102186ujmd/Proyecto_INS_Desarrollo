@@ -1,0 +1,179 @@
+{% extends 'administracion/base.html' %}
+{% block content %}
+<div class="container">
+    <h1>Administración de Roles</h1>
+    <button class="create-role-btn" onclick="openModal('create')">Crear Rol</button>
+
+    <!-- Fondo de la ventana modal -->
+    <div class="modal-overlay" id="modalOverlay" onclick="closeModal()"></div>
+
+    <!-- Formulario de creación/edición de rol como modal -->
+    <form id="roleForm" method="post" class="modal-form">
+        {% csrf_token %}
+        <h2 id="modalTitle">Crear Rol</h2>
+
+        <input type="hidden" id="rolId" name="rol_id">
+        <label for="nombre">Nombre</label>
+        <input type="text" name="nombre" id="nombre" required>
+        
+        <label for="descripcion">Descripción</label>
+        <textarea name="descripcion" id="descripcion"></textarea>
+
+        <button type="submit" class="save-btn">Guardar</button>
+        <button type="button" class="cancel-btn" onclick="closeModal()">Cancelar</button>
+    </form>
+
+    <!-- Modal de confirmación de eliminación -->
+    <form id="deleteForm" method="post" class="modal-form">
+        {% csrf_token %}
+        <input type="hidden" name="rol_id" id="rolDeleteId">
+        <p>¿Estás seguro de que deseas eliminar este rol?</p>
+        <button type="submit" class="delete-btn">Eliminar</button>
+        <button type="button" class="cancel-btn" onclick="closeModal()">Cancelar</button>
+    </form>
+
+    <!-- Tabla de roles -->
+    <table>
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for rol in roles %}
+            <tr>
+                <td>{{ rol.nombre }}</td>
+                <td>{{ rol.descripcion }}</td>
+                <td>
+                    <button onclick="openModal('edit', {{ rol.id }}, '{{ rol.nombre }}', '{{ rol.descripcion }}')">Editar</button>
+                    <button onclick="confirmDelete({{ rol.id }})">Eliminar</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<style>
+    /* Estilos para el botón de crear rol */
+    .create-role-btn {
+        background-color: #333;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        font-size: 1rem;
+        cursor: pointer;
+        border-radius: 5px;
+        margin-top: 20px;
+    }
+
+    /* Fondo de la ventana modal */
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 500;
+    }
+
+    /* Ventana modal */
+    .modal-form {
+        display: none;
+        background-color: #ffffff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 1001;
+        width: 90%;
+        max-width: 450px;
+    }
+
+    .modal-form label {
+        display: block;
+        margin-top: 10px;
+        font-weight: bold;
+        text-align: left;
+    }
+
+    .modal-form input,
+    .modal-form textarea {
+        width: 100%;
+        padding: 10px;
+        margin-top: 5px;
+        border-radius: 5px;
+        border: 1px solid #ddd;
+        box-sizing: border-box;
+    }
+
+    .save-btn, .cancel-btn, .delete-btn {
+        width: 48%;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        font-size: 1rem;
+        cursor: pointer;
+        margin-top: 15px;
+    }
+
+    .save-btn {
+        background-color: #333;
+        color: #fff;
+        margin-left: 4%;
+    }2
+
+    .cancel-btn {
+        background-color: #dc3545;
+        color: #fff;
+        margin-left: 4%;
+    }
+
+    .delete-btn {
+        background-color: #dc3545;
+        color: #fff;
+    }
+</style>
+
+<script>
+    function openModal(action, rolId = null, nombre = '', descripcion = '') {
+        const modalTitle = document.getElementById('modalTitle');
+        const roleForm = document.getElementById('roleForm');
+        const overlay = document.getElementById('modalOverlay');
+        
+        if (action === 'create') {
+            modalTitle.textContent = 'Crear Rol';
+            document.getElementById('rolId').value = '';
+            document.getElementById('nombre').value = '';
+            document.getElementById('descripcion').value = '';
+        } else if (action === 'edit') {
+            modalTitle.textContent = 'Editar Rol';
+            document.getElementById('rolId').value = rolId;
+            document.getElementById('nombre').value = nombre;
+            document.getElementById('descripcion').value = descripcion;
+        }
+
+        roleForm.style.display = 'block';
+        overlay.style.display = 'block';
+    }
+
+    function closeModal() {
+        document.getElementById('roleForm').style.display = 'none';
+        document.getElementById('deleteForm').style.display = 'none';
+        document.getElementById('modalOverlay').style.display = 'none';
+    }
+
+    function confirmDelete(rolId) {
+        document.getElementById('rolDeleteId').value = rolId;
+        document.getElementById('deleteForm').style.display = 'block';
+        document.getElementById('modalOverlay').style.display = 'block';
+    }
+</script>
+{% endblock %}

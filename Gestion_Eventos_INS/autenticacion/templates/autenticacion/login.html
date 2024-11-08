@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Universidad Dr. Jose Matías Delgado</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #ffffff;
+            --secondary-color: #000000;
+            --accent-color: #e0e0e0;
+            --background-color: #ffffff;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: var(--background-color);
+        }
+
+        .container {
+            display: flex;
+            width: 90%;
+            max-width: 1000px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            background-color: var(--primary-color);
+        }
+
+        /* Sección izquierda del formulario */
+        .login-section {
+            width: 50%;
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: var(--secondary-color);
+        }
+
+        .login-section h1 {
+            margin-bottom: 2rem;
+            font-size: 2rem;
+            color: var(--secondary-color);
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            overflow: hidden;
+            background-color: var(--accent-color);
+            margin: 1rem 0;
+            width: 100%;
+        }
+
+        .input-group input {
+            border: none;
+            padding: 0.75rem;
+            flex: 1;
+            font-size: 1rem;
+            background-color: transparent;
+            color: var(--secondary-color);
+        }
+
+        .input-group span {
+            background-color: var(--secondary-color);
+            padding: 0.75rem;
+            font-size: 1.2rem;
+            color: var(--primary-color);
+        }
+
+        .btn {
+            background-color: var(--secondary-color);
+            color: var(--primary-color);
+            border: none;
+            padding: 0.75rem;
+            cursor: pointer;
+            font-size: 1rem;
+            border-radius: 5px;
+            margin-top: 1.5rem;
+            width: 100%;
+            transition: transform 0.3s;
+            box-shadow: 0 4px 10px rgba(255, 255, 255, 0.6);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+        }
+
+        .additional-links {
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            color: var(--secondary-color);
+        }
+
+        .additional-links a {
+            color: var(--secondary-color);
+            text-decoration: none;
+        }
+
+        .additional-links a:hover {
+            text-decoration: underline;
+        }
+
+        /* Sección derecha con imagen de fondo */
+        .welcome-section {
+            width: 50%;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 3rem;
+            flex-direction: column;
+            background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('{% static "Imagen2.jpg" %}') no-repeat center center;
+            background-size: cover;
+        }
+
+        .welcome-section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .welcome-section p {
+            font-size: 1.1rem;
+            max-width: 80%;
+        }
+
+        /* Modal de error */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #ffffff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            padding: 2rem;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 400px;
+            text-align: center;
+            z-index: 1000;
+        }
+
+        .modal.show {
+            display: block;
+        }
+
+        .modal h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #808080;
+        }
+
+        .modal p {
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal button {
+            background-color: #808080;
+            color: #ffffff;
+            border: none;
+            padding: 0.5rem 1rem;
+            font-size: 1rem;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        /* Responsividad */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                width: 90%;
+            }
+
+            .login-section,
+            .welcome-section {
+                width: 100%;
+                padding: 2rem;
+            }
+
+            .welcome-section h2 {
+                font-size: 2rem;
+            }
+
+            .welcome-section p {
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .login-section h1 {
+                font-size: 1.5rem;
+            }
+
+            .welcome-section h2 {
+                font-size: 1.8rem;
+            }
+
+            .btn {
+                font-size: 0.9rem;
+                padding: 0.6rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sección izquierda (Formulario de inicio de sesión) -->
+        <div class="login-section">
+            <h1>Iniciar Sesión</h1>
+            <form method="post" action="{% url 'login' %}">
+                {% csrf_token %}
+                <div class="input-group">
+                    <span>@</span>
+                    {{ form.username }}
+                </div>
+                <div class="input-group">
+                    <span>&#128274;</span>
+                    {{ form.password }}
+                </div>
+                <button type="submit" class="btn">Iniciar Sesión</button>
+            </form>
+
+            {% if form.non_field_errors %}
+            <div class="error-message">
+                <script>
+                    document.addEventListener("DOMContentLoaded", function() {
+                        document.getElementById('errorModal').classList.add('show');
+                    });
+                </script>
+            </div>
+            {% endif %}
+
+            <div class="additional-links">
+                <a href="{% url 'password_reset' %}">¿Olvidaste tu contraseña?</a><br>
+                <a href="mailto:soporte@universidad.edu.sv">Contactar con un asesor</a>
+            </div>
+        </div>
+
+        <!-- Sección derecha (Mensaje de bienvenida con imagen de fondo) -->
+        <div class="welcome-section">
+            <h2>Bienvenido</h2>
+            <p>Explora la plataforma de eventos de la Universidad Dr. Jose Matías Delgado. Regístrate y participa en actividades académicas y culturales.</p>
+            <a href="{% url 'home' %}" class="btn">Regresar</a>
+        </div>
+    </div>
+
+    <!-- Modal de error -->
+    <div class="modal" id="errorModal">
+        <h2>Credenciales incorrectas</h2>
+        <p>Nombre de usuario o contraseña no válidos.</p>
+        <button onclick="closeModal()">Aceptar</button>
+    </div>
+
+    <script>
+        function closeModal() {
+            document.getElementById('errorModal').classList.remove('show');
+        }
+    </script>
+</body>
+</html>

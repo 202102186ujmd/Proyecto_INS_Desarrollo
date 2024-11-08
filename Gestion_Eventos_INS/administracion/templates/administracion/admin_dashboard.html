@@ -1,0 +1,206 @@
+{% extends 'administracion/base.html' %}
+
+{% block title %}Dashboard - Administración{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <h1>Panel de Estadísticas</h1>
+    <div class="stats-overview">
+        <div class="stat-card">
+            <h2>Total de Usuarios</h2>
+            <p>300</p>
+        </div>
+        <div class="stat-card">
+            <h2>Eventos Activos</h2>
+            <p>45</p>
+        </div>
+        <div class="stat-card">
+            <h2>Mensajes Recibidos</h2>
+            <p>120</p>
+        </div>
+    </div>
+
+    <div class="charts-section">
+        <div class="chart-container">
+            <h3>Usuarios por Mes</h3>
+            <canvas id="userChart"></canvas>
+        </div>
+        <div class="chart-container">
+            <h3>Eventos por Mes</h3>
+            <canvas id="eventChart"></canvas>
+        </div>
+    </div>
+
+    <div class="tables-section">
+        <div class="table-container">
+            <h3>Mensajes Recientes</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Remitente</th>
+                        <th>Asunto</th>
+                        <th>Fecha</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Juan Pérez</td>
+                        <td>Consulta sobre evento</td>
+                        <td>03/11/2024</td>
+                    </tr>
+                    <tr>
+                        <td>María Gómez</td>
+                        <td>Solicitud de soporte</td>
+                        <td>02/11/2024</td>
+                    </tr>
+                    <tr>
+                        <td>Carlos Ruiz</td>
+                        <td>Actualización de datos</td>
+                        <td>01/11/2024</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    .dashboard-container {
+        padding: 20px;
+    }
+
+    .stats-overview {
+        display: flex;
+        gap: 20px;
+    }
+
+    .stat-card {
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        flex: 1;
+        text-align: center;
+    }
+
+    .stat-card h2 {
+        margin-bottom: 10px;
+        color: #333;
+    }
+
+    .stat-card p {
+        font-size: 24px;
+        font-weight: bold;
+        color: #555;
+    }
+
+    .charts-section {
+        display: flex;
+        gap: 20px;
+        margin-top: 20px;
+    }
+
+    .chart-container {
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        flex: 1;
+        text-align: center;
+    }
+
+    .chart-container h3 {
+        margin-bottom: 20px;
+        color: #333;
+    }
+
+    .tables-section {
+        margin-top: 20px;
+    }
+
+    .table-container {
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .table-container h3 {
+        margin-bottom: 20px;
+        color: #333;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    table th, table td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    table th {
+        background: #f4f4f4;
+        color: #333;
+    }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Datos de ejemplo para usuarios
+    const userData = {
+        labels: ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
+        datasets: [{
+            label: 'Usuarios Registrados',
+            data: [50, 80, 40, 90, 120, 150, 110, 130, 170, 200, 180, 220],
+            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+            borderColor: 'rgba(54, 162, 235, 1)',
+            borderWidth: 1
+        }]
+    };
+
+    const userChartConfig = {
+        type: 'bar',
+        data: userData,
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    };
+
+    new Chart(document.getElementById('userChart'), userChartConfig);
+
+    // Datos de ejemplo para eventos
+    const eventData = {
+        labels: ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
+        datasets: [{
+            label: 'Eventos Activos',
+            data: [20, 30, 15, 40, 60, 80, 70, 50, 100, 110, 90, 120],
+            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+            borderColor: 'rgba(255, 99, 132, 1)',
+            borderWidth: 1
+        }]
+    };
+
+    const eventChartConfig = {
+        type: 'line',
+        data: eventData,
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    };
+
+    new Chart(document.getElementById('eventChart'), eventChartConfig);
+</script>
+{% endblock %}
